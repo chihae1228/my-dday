@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>작전명: 전역 밥상</title>
+    <title>전설의 취사병 카운터</title>
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Roboto+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --army-green: #4b6334; /* 국방색 */
-            --tactical-orange: #ff7b00; /* 계기판 포인트 색상 */
-            --alert-red: #ff3333; /* 경고 색상 */
-            --metal-dark: #1a1a1a; /* 어두운 금속 배경 */
-            --bg-overlay: rgba(20, 30, 20, 0.9);
+            --army-green: #4b6334;
+            --tactical-orange: #ff7b00;
+            --alert-red: #ff3333;
+            --bg-overlay: rgba(20, 30, 20, 0.95);
+            --rank-color: #f1c40f;
         }
 
         body {
             margin: 0;
             padding: 0;
-            background-color: #000;
+            background-color: #050505;
             color: #dcdcdc;
-            font-family: 'Do Hyeon', sans-serif; /* 가독성 좋은 한글 폰트 */
+            font-family: 'Do Hyeon', sans-serif;
             overflow: hidden;
             height: 100vh;
             display: flex;
@@ -29,178 +29,121 @@
             user-select: none;
         }
 
-        /* 배경: 취사장 연기 효과 */
-        .steam-bg {
+        /* 배경 패턴 */
+        .bg-pattern {
             position: absolute;
             width: 100%;
             height: 100%;
-            background: 
-                radial-gradient(circle at 50% 50%, transparent 0%, #000 90%),
-                repeating-linear-gradient(45deg, #111 0px, #111 2px, #222 2px, #222 4px);
-            z-index: -2;
-        }
-        .steam-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://www.transparenttextures.com/patterns/foggy-birds.png');
+            background-image: radial-gradient(#1a1a1a 15%, transparent 16%), radial-gradient(#1a1a1a 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
             opacity: 0.2;
-            animation: panOverlay 60s linear infinite;
             z-index: -1;
         }
-        @keyframes panOverlay {
-            from { background-position: 0% 0%; }
-            to { background-position: 100% 100%; }
-        }
 
-        /* 메인 컨테이너 (전술 계기판 느낌) */
+        /* 메인 대시보드 */
         .dashboard {
             text-align: center;
             width: 85%;
-            max-width: 550px;
+            max-width: 500px;
             background: var(--bg-overlay);
-            border: 4px solid var(--army-green);
-            border-radius: 5px;
-            padding: 25px;
-            box-shadow: 0 0 20px rgba(75, 99, 52, 0.5), inset 0 0 50px rgba(0,0,0,0.8);
+            border: 3px solid var(--army-green);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(75, 99, 52, 0.3);
             position: relative;
         }
-        
-        /* 나사 장식 */
-        .dashboard::before, .dashboard::after {
-            content: '⊕';
-            position: absolute;
-            color: var(--army-green);
-            font-size: 1.2rem;
-        }
-        .dashboard::before { top: 5px; left: 5px; }
-        .dashboard::after { bottom: 5px; right: 5px; }
 
-        h1 {
+        /* 계급장 표시 구역 */
+        .rank-badge {
             font-family: 'Black Han Sans', sans-serif;
-            font-size: 2rem;
-            margin: 0 0 15px 0;
-            color: var(--tactical-orange);
-            text-shadow: 1px 1px 5px #000;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 2px dashed var(--army-green);
+            font-size: 1.5rem;
+            color: var(--rank-color);
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+            border-bottom: 1px solid #444;
             padding-bottom: 10px;
         }
 
-        /* 취사병 전용 멘트 박스 */
-        .comment-box-container {
-            background: #000;
-            border: 2px solid var(--army-green);
-            padding: 5px;
-            margin-bottom: 20px;
-        }
-        .comment-box {
-            min-height: 40px;
+        /* 밈 멘트 박스 */
+        .meme-box {
+            background: rgba(0, 0, 0, 0.6);
+            border-left: 4px solid var(--tactical-orange);
+            padding: 15px;
+            margin: 15px 0;
+            min-height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.1rem;
+            line-height: 1.4;
             color: #fff;
-            background: rgba(75, 99, 52, 0.3);
-            padding: 5px 10px;
-            font-weight: bold;
         }
 
-        /* 미친 속도의 퍼센트 (계기판 스타일) */
-        .percentage-box {
+        /* 퍼센트 (핵심) */
+        .percent-display {
             font-family: 'Roboto Mono', monospace;
-            font-size: 3rem;
+            font-size: 2.8rem;
             font-weight: 700;
-            margin: 15px 0;
             color: var(--tactical-orange);
-            text-shadow: 0 0 10px rgba(255, 123, 0, 0.3);
-            letter-spacing: -1px;
-            background: #000;
-            padding: 10px;
-            border: 2px solid var(--army-green);
-            display: inline-block;
-            width: 100%;
-            box-sizing: border-box;
+            text-shadow: 0 0 15px rgba(255, 123, 0, 0.4);
+            margin: 10px 0;
         }
-        .percentage-box span.dec {
-            font-size: 1.5rem;
-            color: #888;
-        }
+        .percent-display span.small { font-size: 1.2rem; color: #666; }
 
-        /* 프로그래스 바 (게이지 스타일) */
-        .progress-container {
+        /* 프로그래스 바 */
+        .progress-frame {
             width: 100%;
-            height: 20px;
-            background: #111;
-            border: 2px solid var(--army-green);
-            margin-bottom: 25px;
-            position: relative;
-            padding: 2px;
-            box-sizing: border-box;
+            height: 15px;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
         }
-        .progress-bar {
+        .progress-fill {
             height: 100%;
-            background: repeating-linear-gradient(
-                45deg,
-                var(--army-green),
-                var(--army-green) 10px,
-                var(--tactical-orange) 10px,
-                var(--tactical-orange) 20px
-            );
+            background: linear-gradient(90deg, var(--army-green), var(--tactical-orange));
             width: 0%;
-            box-shadow: 0 0 10px var(--tactical-orange);
             transition: width 0.1s linear;
         }
 
-        /* 남은 시간 정보 패널 */
+        /* 정보 그리드 */
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-bottom: 25px;
-            border-top: 2px dashed var(--army-green);
-            padding-top: 15px;
+            margin-bottom: 20px;
         }
-        .info-card {
-            background: rgba(0, 0, 0, 0.5);
+        .info-item {
+            background: #111;
             padding: 10px;
-            border: 1px solid var(--army-green);
+            border-radius: 5px;
+            border: 1px solid #333;
         }
-        .label {
-            font-size: 0.9rem;
-            color: var(--army-green);
-            display: block; margin-bottom: 5px; font-weight: bold;
-        }
-        .value {
-            font-family: 'Roboto Mono', monospace;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #fff;
-        }
+        .info-label { font-size: 0.8rem; color: #888; display: block; margin-bottom: 5px; }
+        .info-value { font-size: 1.2rem; font-weight: bold; color: #fff; font-family: 'Roboto Mono'; }
 
-        /* 화력 집중 버튼 */
-        .boost-btn {
-            background: #222;
-            border: 3px solid var(--alert-red);
-            color: var(--alert-red);
-            padding: 15px 20px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.1s;
-            font-family: 'Black Han Sans', sans-serif;
-            box-shadow: 0 5px 0 #500;
+        /* 화력 버튼 */
+        .fire-btn {
             width: 100%;
-            box-sizing: border-box;
+            background: #222;
+            color: var(--alert-red);
+            border: 2px solid var(--alert-red);
+            padding: 15px;
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
         }
-        .boost-btn:active {
-            transform: translateY(5px);
-            box-shadow: none;
+        .fire-btn:active {
             background: var(--alert-red);
             color: #000;
+            transform: scale(0.98);
         }
 
-        /* 화면 흔들림 효과 */
+        /* 쉐이크 효과 */
         .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
             10%, 90% { transform: translate3d(-2px, 0, 0); }
@@ -211,130 +154,163 @@
     </style>
 </head>
 <body>
-    <div class="steam-bg"></div>
-    <div class="steam-overlay"></div>
+    <div class="bg-pattern"></div>
 
-    <div class="dashboard" id="dashboard">
-        <h1>🔥 O.P.S: 짬밥 탈출 작전</h1>
+    <div class="dashboard" id="main-panel">
+        <div class="rank-badge" id="rank-text">계급 분석 중...</div>
         
-        <div class="comment-box-container">
-            <div class="comment-box" id="comment">통신 연결 중...</div>
+        <div class="meme-box">
+            <span id="meme-text">통신 연결 중...</span>
         </div>
 
-        <div class="percentage-box">
-            <span id="percent-int">00</span>.<span id="percent-dec" class="dec">0000000</span><span>%</span>
+        <div class="percent-display">
+            <span id="p-int">00</span>.<span id="p-dec" class="small">0000000</span>%
         </div>
 
-        <div class="progress-container">
-            <div class="progress-bar" id="bar"></div>
+        <div class="progress-frame">
+            <div class="progress-fill" id="p-bar"></div>
         </div>
 
         <div class="info-grid">
-            <div class="info-card">
-                <span class="label">■ 작전 종료일 (D-Day)</span>
-                <span class="value" id="d-day" style="color: var(--tactical-orange)">---</span>
+            <div class="info-item">
+                <span class="info-label">D-DAY</span>
+                <span class="info-value" id="d-day-val">-</span>
             </div>
-            <div class="info-card">
-                <span class="label">■ 잔여 작전 시간 (초)</span>
-                <span class="value" id="seconds-left">---</span>
+            <div class="info-item">
+                <span class="info-label">남은 초 (Sec)</span>
+                <span class="info-value" id="sec-val">-</span>
             </div>
         </div>
 
-        <button class="boost-btn" onclick="boostEffect()">⚠️ 긴급: 화력 최대치 개방 (가스불 ON)</button>
+        <button class="fire-btn" onclick="fireEffect()">⚠️ 가스불 화력 최대로! (클릭)</button>
     </div>
 
     <script>
-        // --- ⚙️ 전우님 데이터 (2026.09.30 전역) ---
+        // --- ⚙️ 설정: 전우님 군생활 데이터 (수정금지) ---
         const startDate = new Date('2025-04-01T00:00:00');
-        const endDate = new Date('2026-09-30T00:00:00'); 
+        const endDate = new Date('2026-09-30T23:59:59'); // 26년 9월 30일
+        
+        // --- 🎖️ 계급별 취사병 밈 데이터베이스 ---
+        const rankData = [
+            { limit: 10, rank: "이등병 (식판 세척봇)", msgs: [
+                "선임님, 식판 2000개 닦았습니다!",
+                "???: 야 짬통 비우고 와라",
+                "눈치 챙겨... 식당 청소나 해...",
+                "어머니, 밥 냄새가 싫습니다..."
+            ]},
+            { limit: 35, rank: "일병 (삽질 마스터)", msgs: [
+                "오늘 메뉴: 쏘야... 손목 나가는 날",
+                "삽으로 300인분 볶기 가능?",
+                "재료 손질하다 손가락 베였습니다!",
+                "행보관님: 취사장 위생상태 불량!"
+            ]},
+            { limit: 60, rank: "상병 (메인 셰프)", msgs: [
+                "간은 내가 본다. 아무도 손 대지 마.",
+                "오늘 튀김 상태 예술이지 않습니까?",
+                "신병아, 쌀 씻는 물 조절 잘 해라.",
+                "취사장에 내 전용 의자 어디 갔냐?"
+            ]},
+            { limit: 90, rank: "병장 (미각의 신)", msgs: [
+                "야 라면 물 좀 올려라.",
+                "오늘 밥맛이 왜 이러냐? (훈수)",
+                "어디 구석에서 자다가 밥 때 옴",
+                "투명인간 모드 작동 중..."
+            ]},
+            { limit: 100, rank: "말년 (민간인 진)", msgs: [
+                "떨어지는 낙엽도 피해라",
+                "전역빵 만들 시간이다",
+                "민간인 냄새가 난다...",
+                "집에 보내줘!!!!!"
+            ]}
+        ];
 
-        function updateTimer() {
+        function update() {
             const now = new Date();
             const total = endDate - startDate;
             const elapsed = now - startDate;
             const remaining = endDate - now;
 
+            // 1. 퍼센트 계산
             let percent = (elapsed / total) * 100;
             if (percent < 0) percent = 0; if (percent > 100) percent = 100;
 
-            const percentStr = percent.toFixed(7); 
-            const [integerPart, decimalPart] = percentStr.split('.');
+            // 2. 화면 표시 (소수점 7자리)
+            const pStr = percent.toFixed(7);
+            document.getElementById('p-int').innerText = pStr.split('.')[0];
+            document.getElementById('p-dec').innerText = pStr.split('.')[1];
+            document.getElementById('p-bar').style.width = percent + '%';
 
-            document.getElementById('percent-int').innerText = integerPart;
-            document.getElementById('percent-dec').innerText = decimalPart;
-            document.getElementById('bar').style.width = percent + '%';
-
+            // 3. 남은 시간 표시
             const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
-            const seconds = Math.floor(remaining / 1000);
-
+            const sec = Math.floor(remaining / 1000);
+            
             if (remaining <= 0) {
-                document.getElementById('d-day').innerText = "작전 완료";
-                document.getElementById('seconds-left').innerText = "0";
-                document.querySelector('.boost-btn').innerText = "🎉 축하한다! 민간인! 🎉";
-                document.querySelector('.boost-btn').style.color = "#fff";
-                document.querySelector('.boost-btn').style.background = var(--army-green);
-                return;
+                document.getElementById('d-day-val').innerText = "전역";
+                document.getElementById('sec-val').innerText = "0";
+                document.getElementById('rank-text').innerText = "🎉 축 전 역 🎉";
+                document.getElementById('meme-text').innerText = "고생했다! 나가서 맛있는 거 먹어라!";
+            } else {
+                document.getElementById('d-day-val').innerText = `D-${days}`;
+                document.getElementById('sec-val').innerText = sec.toLocaleString();
+                
+                // 4. 계급 및 밈 업데이트 (가장 중요한 부분)
+                updateRankAndMeme(percent);
             }
-
-            document.getElementById('d-day').innerText = `D-${days}`;
-            document.getElementById('seconds-left').innerText = seconds.toLocaleString();
         }
 
-        // 🔥 취사병 전용 밈 & 인식 문구 리스트 🔥
-        const comments = [
-            "???: 아저씨 오늘 메뉴 뭡니까?",
-            "삽으로 밥 볶는 스킬 Lv.50 달성...",
-            "오늘 조식 쏘야... 손목 나갈 예정.",
-            "취사장 뒤편 짬타이거와 눈이 마주쳤다.",
-            "행보관님: 오늘 잔반 왜 이렇게 많아?",
-            "식수 인원 파악 좀 제대로 합시다 (분노)",
-            "맛스타? 아니 요즘은 뭐 나오더라...",
-            "전역하면 다시는 대량 조리 안 한다.",
-            "짬내가 피부에 문신처럼 새겨진 기분.",
-            "특식 나오는 날 = 취사병 죽어나는 날",
-            "조리삽 든 내 모습, 제법 멋질지도?",
-            "솔직히 내가 만든 건빵튀김이 제일 맛있음."
-        ];
+        // 계급 및 밈 관리 함수
+        let lastRankIndex = -1;
+        
+        function updateRankAndMeme(percent) {
+            // 현재 퍼센트에 맞는 계급 찾기
+            let currentData = rankData.find(d => percent < d.limit) || rankData[rankData.length - 1];
+            
+            // 계급 텍스트 업데이트
+            document.getElementById('rank-text').innerText = `현재 계급: ${currentData.rank}`;
 
-        function changeComment() {
-            const randomIndex = Math.floor(Math.random() * comments.length);
-            document.getElementById('comment').innerText = comments[randomIndex];
+            // 밈은 4초마다 랜덤 변경 (여기서 제어하지 않고 별도 인터벌로 돔)
+            // 현재 계급 데이터를 전역 변수처럼 활용하기 위해 저장
+            window.currentMemeList = currentData.msgs;
         }
 
-        // ⚠️ 화력 집중 버튼 이펙트
-        function boostEffect() {
-            const dashboard = document.getElementById('dashboard');
-            const btn = document.querySelector('.boost-btn');
-            
-            dashboard.classList.remove('shake');
-            void dashboard.offsetWidth; 
-            dashboard.classList.add('shake');
+        // 밈 교체 로직
+        function rotateMeme() {
+            if (window.currentMemeList) {
+                const msgs = window.currentMemeList;
+                const randomMsg = msgs[Math.floor(Math.random() * msgs.length)];
+                document.getElementById('meme-text').innerText = randomMsg;
+            }
+        }
 
-            const tacticalAlerts = [
-                "🔥 경고: 화력이 너무 강합니다! 밥 탑니다!",
-                "🚫 취사장이 흔들리고 있습니다!",
-                "⚠️ 행보관님이 이 버튼을 싫어합니다.",
-                "🔥 가스비 폭발! 진정하십시오 휴먼.",
-                "🍳 조리 속도 한계 돌파 시도 중..."
-            ];
-            const randomAlert = tacticalAlerts[Math.floor(Math.random() * tacticalAlerts.length)];
-            
+        // 버튼 효과 (오류 수정됨!)
+        function fireEffect() {
+            const panel = document.getElementById('main-panel');
+            const btn = document.querySelector('.fire-btn');
+
+            // 흔들림 효과
+            panel.classList.remove('shake');
+            void panel.offsetWidth; 
+            panel.classList.add('shake');
+
+            // 텍스트 변경
+            const alerts = ["🔥 화력 과부하!!", "🚫 취사장 폭발 임박!", "👮 행보관 등장!", "🍳 조리 속도 500%"];
             const originalText = btn.innerText;
-            btn.innerText = randomAlert;
-            btn.style.background = var(--alert-red);
-            btn.style.color = "#000";
             
+            btn.innerText = alerts[Math.floor(Math.random() * alerts.length)];
+            btn.style.background = "#ff3333"; // 여기서 오류 났던 것 수정함
+            btn.style.color = "black";
+
             setTimeout(() => {
                 btn.innerText = originalText;
                 btn.style.background = "#222";
-                btn.style.color = var(--alert-red);
-            }, 1200);
+                btn.style.color = "#ff3333";
+            }, 1000);
         }
 
-        setInterval(updateTimer, 30); 
-        setInterval(changeComment, 4000); // 멘트 변경 속도 조절
-        updateTimer();
-        changeComment();
+        // 실행
+        setInterval(update, 30);      // 0.03초마다 숫자 갱신
+        setInterval(rotateMeme, 4000); // 4초마다 멘트 변경
+        update(); // 즉시 실행
     </script>
 </body>
 </html>
