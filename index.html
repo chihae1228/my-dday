@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>전역 카운트다운 2.0</title>
-    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <title>작전명: 전역 밥상</title>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Roboto+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #00ff88; /* 네온 그린 */
-            --secondary: #00d4ff; /* 네온 블루 */
-            --danger: #ff0055; /* 네온 레드 */
-            --bg: #0a0a0a;
+            --army-green: #4b6334; /* 국방색 */
+            --tactical-orange: #ff7b00; /* 계기판 포인트 색상 */
+            --alert-red: #ff3333; /* 경고 색상 */
+            --metal-dark: #1a1a1a; /* 어두운 금속 배경 */
+            --bg-overlay: rgba(20, 30, 20, 0.9);
         }
 
         body {
             margin: 0;
             padding: 0;
-            background-color: var(--bg);
-            color: white;
-            font-family: 'Roboto Mono', monospace; /* 숫자 간지 폰트 */
+            background-color: #000;
+            color: #dcdcdc;
+            font-family: 'Do Hyeon', sans-serif; /* 가독성 좋은 한글 폰트 */
             overflow: hidden;
             height: 100vh;
             display: flex;
@@ -28,188 +29,200 @@
             user-select: none;
         }
 
-        /* 배경 워프 효과 */
-        .stars {
+        /* 배경: 취사장 연기 효과 */
+        .steam-bg {
             position: absolute;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, transparent 0%, var(--bg) 100%),
-                        url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.5;
-            animation: warp 20s linear infinite;
+            background: 
+                radial-gradient(circle at 50% 50%, transparent 0%, #000 90%),
+                repeating-linear-gradient(45deg, #111 0px, #111 2px, #222 2px, #222 4px);
+            z-index: -2;
+        }
+        .steam-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/foggy-birds.png');
+            opacity: 0.2;
+            animation: panOverlay 60s linear infinite;
             z-index: -1;
         }
-
-        @keyframes warp {
-            from { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-            to { transform: scale(1); opacity: 0.5; }
+        @keyframes panOverlay {
+            from { background-position: 0% 0%; }
+            to { background-position: 100% 100%; }
         }
 
-        /* 메인 컨테이너 */
+        /* 메인 컨테이너 (전술 계기판 느낌) */
         .dashboard {
             text-align: center;
-            width: 90%;
-            max-width: 600px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px 20px;
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.1);
+            width: 85%;
+            max-width: 550px;
+            background: var(--bg-overlay);
+            border: 4px solid var(--army-green);
+            border-radius: 5px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(75, 99, 52, 0.5), inset 0 0 50px rgba(0,0,0,0.8);
             position: relative;
         }
+        
+        /* 나사 장식 */
+        .dashboard::before, .dashboard::after {
+            content: '⊕';
+            position: absolute;
+            color: var(--army-green);
+            font-size: 1.2rem;
+        }
+        .dashboard::before { top: 5px; left: 5px; }
+        .dashboard::after { bottom: 5px; right: 5px; }
 
         h1 {
             font-family: 'Black Han Sans', sans-serif;
             font-size: 2rem;
-            margin: 0 0 10px 0;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+            margin: 0 0 15px 0;
+            color: var(--tactical-orange);
+            text-shadow: 1px 1px 5px #000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px dashed var(--army-green);
+            padding-bottom: 10px;
         }
 
-        /* 미친 속도로 올라가는 퍼센트 */
-        .percentage-box {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin: 20px 0;
-            color: var(--primary);
-            text-shadow: 0 0 20px var(--primary);
-            letter-spacing: -2px;
-        }
-        
-        .percentage-box span {
-            font-size: 1.2rem;
-            color: rgba(255,255,255,0.7);
-        }
-
-        /* 프로그래스 바 */
-        .progress-container {
-            width: 100%;
-            height: 15px;
-            background: #333;
-            border-radius: 10px;
-            overflow: hidden;
+        /* 취사병 전용 멘트 박스 */
+        .comment-box-container {
+            background: #000;
+            border: 2px solid var(--army-green);
+            padding: 5px;
             margin-bottom: 20px;
-            position: relative;
         }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            width: 0%;
-            box-shadow: 0 0 20px var(--primary);
-            transition: width 0.1s linear;
-            position: relative;
-        }
-        
-        /* 바 끝에서 빛나는 효과 */
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 5px;
-            height: 100%;
-            background: white;
-            box-shadow: 0 0 10px white;
-        }
-
-        /* 남은 시간 정보 */
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .info-card {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .label {
-            font-size: 0.8rem;
-            color: #888;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .value {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        /* 멘트 박스 */
         .comment-box {
-            min-height: 50px;
+            min-height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Black Han Sans', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #fff;
-            margin-bottom: 20px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        /* 도파민 버튼 */
-        .boost-btn {
-            background: transparent;
-            border: 2px solid var(--danger);
-            color: var(--danger);
-            padding: 15px 30px;
-            font-size: 1rem;
+            background: rgba(75, 99, 52, 0.3);
+            padding: 5px 10px;
             font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-family: 'Black Han Sans', sans-serif;
-            box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
         }
 
+        /* 미친 속도의 퍼센트 (계기판 스타일) */
+        .percentage-box {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: var(--tactical-orange);
+            text-shadow: 0 0 10px rgba(255, 123, 0, 0.3);
+            letter-spacing: -1px;
+            background: #000;
+            padding: 10px;
+            border: 2px solid var(--army-green);
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .percentage-box span.dec {
+            font-size: 1.5rem;
+            color: #888;
+        }
+
+        /* 프로그래스 바 (게이지 스타일) */
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background: #111;
+            border: 2px solid var(--army-green);
+            margin-bottom: 25px;
+            position: relative;
+            padding: 2px;
+            box-sizing: border-box;
+        }
+        .progress-bar {
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--army-green),
+                var(--army-green) 10px,
+                var(--tactical-orange) 10px,
+                var(--tactical-orange) 20px
+            );
+            width: 0%;
+            box-shadow: 0 0 10px var(--tactical-orange);
+            transition: width 0.1s linear;
+        }
+
+        /* 남은 시간 정보 패널 */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-top: 2px dashed var(--army-green);
+            padding-top: 15px;
+        }
+        .info-card {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border: 1px solid var(--army-green);
+        }
+        .label {
+            font-size: 0.9rem;
+            color: var(--army-green);
+            display: block; margin-bottom: 5px; font-weight: bold;
+        }
+        .value {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        /* 화력 집중 버튼 */
+        .boost-btn {
+            background: #222;
+            border: 3px solid var(--alert-red);
+            color: var(--alert-red);
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.1s;
+            font-family: 'Black Han Sans', sans-serif;
+            box-shadow: 0 5px 0 #500;
+            width: 100%;
+            box-sizing: border-box;
+        }
         .boost-btn:active {
-            transform: scale(0.95);
-            background: var(--danger);
-            color: white;
-            box-shadow: 0 0 30px var(--danger);
+            transform: translateY(5px);
+            box-shadow: none;
+            background: var(--alert-red);
+            color: #000;
         }
 
         /* 화면 흔들림 효과 */
-        .shake {
-            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-        }
-
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
         }
-
     </style>
 </head>
 <body>
-    <div class="stars"></div>
+    <div class="steam-bg"></div>
+    <div class="steam-overlay"></div>
 
     <div class="dashboard" id="dashboard">
-        <h1>PROJECT: FREEDOM</h1>
+        <h1>🔥 O.P.S: 짬밥 탈출 작전</h1>
         
-        <div class="comment-box" id="comment">로딩중...</div>
+        <div class="comment-box-container">
+            <div class="comment-box" id="comment">통신 연결 중...</div>
+        </div>
 
         <div class="percentage-box">
-            <span id="percent-int">00</span>.<span id="percent-dec" style="font-size: 2.5rem;">0000000</span><span>%</span>
+            <span id="percent-int">00</span>.<span id="percent-dec" class="dec">0000000</span><span>%</span>
         </div>
 
         <div class="progress-container">
@@ -218,22 +231,22 @@
 
         <div class="info-grid">
             <div class="info-card">
-                <span class="label">남은 일수 (D-Day)</span>
-                <span class="value" id="d-day" style="color: var(--secondary)">Calculating...</span>
+                <span class="label">■ 작전 종료일 (D-Day)</span>
+                <span class="value" id="d-day" style="color: var(--tactical-orange)">---</span>
             </div>
             <div class="info-card">
-                <span class="label">남은 시간 (초)</span>
-                <span class="value" id="seconds-left" style="color: var(--danger)">Calculating...</span>
+                <span class="label">■ 잔여 작전 시간 (초)</span>
+                <span class="value" id="seconds-left">---</span>
             </div>
         </div>
 
-        <button class="boost-btn" onclick="boostEffect()">⚠️ 시간 가속기 (누르지 마시오)</button>
+        <button class="boost-btn" onclick="boostEffect()">⚠️ 긴급: 화력 최대치 개방 (가스불 ON)</button>
     </div>
 
     <script>
-        // --- ⚙️ 설정값 (전우님 데이터) ---
+        // --- ⚙️ 전우님 데이터 (2026.09.30 전역) ---
         const startDate = new Date('2025-04-01T00:00:00');
-        const endDate = new Date('2026-09-30T00:00:00'); // 9월 30일 자정
+        const endDate = new Date('2026-09-30T00:00:00'); 
 
         function updateTimer() {
             const now = new Date();
@@ -241,10 +254,8 @@
             const elapsed = now - startDate;
             const remaining = endDate - now;
 
-            // 1. 퍼센트 계산 (소수점 7자리까지 보여줘서 속도감 UP)
             let percent = (elapsed / total) * 100;
-            if (percent < 0) percent = 0;
-            if (percent > 100) percent = 100;
+            if (percent < 0) percent = 0; if (percent > 100) percent = 100;
 
             const percentStr = percent.toFixed(7); 
             const [integerPart, decimalPart] = percentStr.split('.');
@@ -253,33 +264,36 @@
             document.getElementById('percent-dec').innerText = decimalPart;
             document.getElementById('bar').style.width = percent + '%';
 
-            // 2. 남은 시간 계산
             const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
             const seconds = Math.floor(remaining / 1000);
 
             if (remaining <= 0) {
-                document.getElementById('d-day').innerText = "전역 완료";
+                document.getElementById('d-day').innerText = "작전 완료";
                 document.getElementById('seconds-left').innerText = "0";
-                document.querySelector('.boost-btn').innerText = "🎉 축하합니다 🎉";
+                document.querySelector('.boost-btn').innerText = "🎉 축하한다! 민간인! 🎉";
+                document.querySelector('.boost-btn').style.color = "#fff";
+                document.querySelector('.boost-btn').style.background = var(--army-green);
                 return;
             }
 
             document.getElementById('d-day').innerText = `D-${days}`;
-            document.getElementById('seconds-left').innerText = seconds.toLocaleString(); // 쉼표 추가
+            document.getElementById('seconds-left').innerText = seconds.toLocaleString();
         }
 
-        // 3. 랜덤 멘트 시스템 (팩트폭력 & 유머)
+        // 🔥 취사병 전용 밈 & 인식 문구 리스트 🔥
         const comments = [
-            "국방부 시계도 가긴 갑니다... 아마도?",
-            "지금 이 순간에도 전역일은 다가옵니다.",
-            "오늘 짬밥 뭐 나올지나 고민합시다.",
-            "동기들은 지금 뭐 하고 있을까요?",
-            "침대에 눕고 싶다... 격렬하게...",
-            "사회에선 지금 아이폰 17 나왔으려나?",
-            "솔직히 지금 시계 보고 있는 거 시간 낭비임 ㅋ",
-            "님 혹시 아직도 일병 아니죠?",
-            "전역하면 뭐 할지 메모장에 적어보세요.",
-            "도파민 충전 완료. 버티십쇼."
+            "???: 아저씨 오늘 메뉴 뭡니까?",
+            "삽으로 밥 볶는 스킬 Lv.50 달성...",
+            "오늘 조식 쏘야... 손목 나갈 예정.",
+            "취사장 뒤편 짬타이거와 눈이 마주쳤다.",
+            "행보관님: 오늘 잔반 왜 이렇게 많아?",
+            "식수 인원 파악 좀 제대로 합시다 (분노)",
+            "맛스타? 아니 요즘은 뭐 나오더라...",
+            "전역하면 다시는 대량 조리 안 한다.",
+            "짬내가 피부에 문신처럼 새겨진 기분.",
+            "특식 나오는 날 = 취사병 죽어나는 날",
+            "조리삽 든 내 모습, 제법 멋질지도?",
+            "솔직히 내가 만든 건빵튀김이 제일 맛있음."
         ];
 
         function changeComment() {
@@ -287,43 +301,40 @@
             document.getElementById('comment').innerText = comments[randomIndex];
         }
 
-        // 4. 시간 가속기 버튼 이펙트
+        // ⚠️ 화력 집중 버튼 이펙트
         function boostEffect() {
             const dashboard = document.getElementById('dashboard');
             const btn = document.querySelector('.boost-btn');
             
-            // 화면 흔들림
             dashboard.classList.remove('shake');
-            void dashboard.offsetWidth; // 리플로우 강제
+            void dashboard.offsetWidth; 
             dashboard.classList.add('shake');
 
-            // 멘트 변경
-            const funnyAlerts = [
-                "🚫 국방부가 이 요청을 거부합니다.",
-                "⚡ 행정반에서 호출했습니다.",
-                "⚠️ 시간이 오히려 느려진 것 같습니다.",
-                "🐌 달팽이가 지나갑니다...",
-                "🔧 마음만은 이미 전역입니다."
+            const tacticalAlerts = [
+                "🔥 경고: 화력이 너무 강합니다! 밥 탑니다!",
+                "🚫 취사장이 흔들리고 있습니다!",
+                "⚠️ 행보관님이 이 버튼을 싫어합니다.",
+                "🔥 가스비 폭발! 진정하십시오 휴먼.",
+                "🍳 조리 속도 한계 돌파 시도 중..."
             ];
-            const randomAlert = funnyAlerts[Math.floor(Math.random() * funnyAlerts.length)];
+            const randomAlert = tacticalAlerts[Math.floor(Math.random() * tacticalAlerts.length)];
             
-            // 버튼 텍스트 잠깐 변경
             const originalText = btn.innerText;
             btn.innerText = randomAlert;
-            btn.style.borderColor = "#fff";
+            btn.style.background = var(--alert-red);
+            btn.style.color = "#000";
             
             setTimeout(() => {
                 btn.innerText = originalText;
-                btn.style.borderColor = "var(--danger)";
-            }, 1000);
+                btn.style.background = "#222";
+                btn.style.color = var(--alert-red);
+            }, 1200);
         }
 
-        // 실행 주기 설정
-        setInterval(updateTimer, 30); // 0.03초마다 갱신 (미친 속도감의 핵심)
-        setInterval(changeComment, 5000); // 5초마다 멘트 변경
+        setInterval(updateTimer, 30); 
+        setInterval(changeComment, 4000); // 멘트 변경 속도 조절
         updateTimer();
         changeComment();
-
     </script>
 </body>
 </html>
